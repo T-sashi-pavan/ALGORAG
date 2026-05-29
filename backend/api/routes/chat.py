@@ -8,9 +8,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 # Import pipelines
-from vectorstore.mongodb import MongoDBVectorStore
-from embeddings.bge import BGEEmbeddings
-from reranker.bge_rerank import BGEReranker
+from api.dependencies import LazyProxy, get_vectorstore, get_embedding_client, get_reranker
 from prompts.system import SYSTEM_PROMPT, format_context_blocks, format_document_summaries
 
 logger = logging.getLogger("algonox.routes.chat")
@@ -50,12 +48,9 @@ class UpdateSessionRequest(BaseModel):
     document_ids: Optional[List[str]] = None
 
 # Instances
-try:
-    vectorstore = MongoDBVectorStore()
-    embedding_client = BGEEmbeddings()
-    reranker = BGEReranker()
-except Exception as e:
-    logger.error(f"Failed to initialize chat route dependencies: {e}")
+vectorstore = LazyProxy(get_vectorstore)
+embedding_client = LazyProxy(get_embedding_client)
+reranker = LazyProxy(get_reranker)
 
 def classify_query(query: str) -> str:
     """

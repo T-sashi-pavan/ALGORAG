@@ -25,14 +25,6 @@ embedding_client = None
 semantic_chunker = None
 ocr_engine = None
 
-try:
-    vectorstore = MongoDBVectorStore()
-    embedding_client = BGEEmbeddings()
-    semantic_chunker = SemanticChunker(embedding_client=embedding_client)
-    ocr_engine = OCREngine()
-except Exception as e:
-    logger.error(f"Failed to initialize RAG backend instances: {e}")
-
 def get_vectorstore():
     global vectorstore
     if not vectorstore:

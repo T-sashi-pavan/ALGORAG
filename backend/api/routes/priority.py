@@ -15,9 +15,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 # Import dependencies
-from scraping.engine import PortalScraper
-from embeddings.bge import BGEEmbeddings
-from vectorstore.mongodb import MongoDBVectorStore
+from api.dependencies import LazyProxy, get_embedding_client, get_scraper, get_vectorstore
 
 logger = logging.getLogger("algonox.routes.priority")
 router = APIRouter(prefix="/api/priority", tags=["priority"])
@@ -65,12 +63,9 @@ class ReviewActionRequest(BaseModel):
     metadata: Optional[dict] = None
 
 # Initialize instances
-try:
-    embedding_client = BGEEmbeddings()
-    scraper = PortalScraper(embedding_client=embedding_client)
-    vectorstore = MongoDBVectorStore()
-except Exception as e:
-    logger.error(f"Failed to load priority dependencies: {e}")
+embedding_client = LazyProxy(get_embedding_client)
+scraper = LazyProxy(get_scraper)
+vectorstore = LazyProxy(get_vectorstore)
 
 # Helper to generate AI enrichment concurrently
 async def enrich_document_details(card: dict, keyword: str) -> dict:

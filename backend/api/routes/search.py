@@ -10,11 +10,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 # Import custom pipelines & scraping engine
-from scraping.engine import PortalScraper
-from embeddings.bge import BGEEmbeddings
-from vectorstore.mongodb import MongoDBVectorStore
-from chunking.semantic import SemanticChunker
-from ocr.engine import OCREngine
+from api.dependencies import LazyProxy, get_embedding_client, get_scraper, get_vectorstore, get_semantic_chunker, get_ocr_engine
 
 logger = logging.getLogger("algonox.routes.search")
 router = APIRouter(prefix="/api/search", tags=["search"])
@@ -32,14 +28,11 @@ class SearchResultCard(BaseModel):
     relevance_score: Optional[float] = 0.0
 
 # Initialize instances
-try:
-    embedding_client = BGEEmbeddings()
-    scraper = PortalScraper(embedding_client=embedding_client)
-    vectorstore = MongoDBVectorStore()
-    semantic_chunker = SemanticChunker(embedding_client=embedding_client)
-    ocr_engine = OCREngine()
-except Exception as e:
-    logger.error(f"Failed to initialize search route dependencies: {e}")
+embedding_client = LazyProxy(get_embedding_client)
+scraper = LazyProxy(get_scraper)
+vectorstore = LazyProxy(get_vectorstore)
+semantic_chunker = LazyProxy(get_semantic_chunker)
+ocr_engine = LazyProxy(get_ocr_engine)
 
 
 @router.post("", response_model=List[SearchResultCard])
