@@ -24,6 +24,8 @@ services:
     envVars:
       - key: PORT
         value: 8000
+      - key: PYTHON_VERSION
+        value: 3.11.8
       
       # Core Database Credentials & AI Keys
       - key: MONGODB_URI

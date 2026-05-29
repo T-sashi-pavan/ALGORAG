@@ -8,8 +8,12 @@ logger = logging.getLogger("algonox.scraping")
 
 class PortalScraper:
     def __init__(self, embedding_client=None):
-        self.tavily_api_key = os.getenv("TAVILY_API_KEY", "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")
-        self.scraper_api_key = os.getenv("SCRAPER_API_KEY", "357c8efc06bf0318bd9b9c8167b13c59")
+        self.tavily_api_key = os.getenv("TAVILY_API_KEY", "")
+        self.scraper_api_key = os.getenv("SCRAPER_API_KEY", "")
+        if not self.tavily_api_key:
+            logger.warning("TAVILY_API_KEY environment variable is not set. Portal searches will be unavailable.")
+        if not self.scraper_api_key:
+            logger.warning("SCRAPER_API_KEY environment variable is not set. Portal scrapers will fail.")
         self.embedding_client = embedding_client
         
         # Supported portals list
