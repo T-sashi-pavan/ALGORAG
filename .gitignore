@@ -1,0 +1,69 @@
+# =====================================================================
+# RAGINI - VERSION CONTROL EXCLUSIONS (.gitignore)
+# =====================================================================
+
+# -------------------------------------------------------------------
+# 1. Environment & Sensitive Configs (CRITICAL)
+# -------------------------------------------------------------------
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+*.env.*
+
+# -------------------------------------------------------------------
+# 2. Python Backend Exclusions
+# -------------------------------------------------------------------
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+pyvenv.cfg
+.python-version
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+
+# Document Processing & Temp Uploads
+temp_uploads/*
+!temp_uploads/.gitkeep
+*.log
+
+# -------------------------------------------------------------------
+# 3. Next.js Frontend Exclusions
+# -------------------------------------------------------------------
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Next.js Build Output
+.next/
+out/
+build/
+tsconfig.tsbuildinfo
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -------------------------------------------------------------------
+# 4. OS & IDE Exclusions
+# -------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

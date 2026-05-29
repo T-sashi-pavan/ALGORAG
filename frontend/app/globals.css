@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-orbitron: 'Orbitron', monospace;
+}
+
+/* Custom Cybernetic Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(8, 3, 19, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(217, 70, 239, 0.25);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.45);
+}
+
+/* Base resets & styled defaults */
+body {
+  background-color: #03000a;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.08) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+/* Ultra Premium Dark Glassmorphism Styling Utility */
+.cyber-glass {
+  background: rgba(8, 3, 19, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.cyber-glass-purple {
+  background: rgba(13, 7, 28, 0.55);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(217, 70, 239, 0.15);
+}
+
+.cyber-glass-blue {
+  background: rgba(7, 13, 28, 0.55);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+}
+
+/* Futuristic Neon Borders & Text Effects */
+.border-neon-purple {
+  border: 1px solid rgba(217, 70, 239, 0.4);
+  box-shadow: 0 0 10px rgba(217, 70, 239, 0.15);
+}
+
+.border-neon-blue {
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+}
+
+.text-glow-blue {
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+}
+
+.text-glow-purple {
+  text-shadow: 0 0 8px rgba(217, 70, 239, 0.6);
+}
+
+/* Animated Interactive Grid */
+.bg-grid-mesh {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(139, 92, 246, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(139, 92, 246, 0.04) 1px, transparent 1px);
+}
+
+/* Circuit pattern vector details */
+.bg-circuit-overlay {
+  background-image: radial-gradient(rgba(0, 240, 255, 0.15) 1px, transparent 0);
+  background-size: 24px 24px;
+}
