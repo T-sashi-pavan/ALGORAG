@@ -3,7 +3,6 @@ uvicorn==0.28.0
 pymongo==4.6.2
 sentence-transformers==2.5.1
 redis==5.0.3
-playwright==1.42.0
 unstructured>=0.14.2
 langchain==0.1.12
 langchain-community==0.0.28
