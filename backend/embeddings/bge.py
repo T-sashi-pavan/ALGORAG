@@ -61,6 +61,60 @@ class BGEEmbeddings:
                 time.sleep(2)
         raise ValueError("HF API failed to return embeddings.")
 
+    def _pool_response(self, res, expect_batch: bool):
+        """
+        Custom Mean Pooling Parser for Hugging Face Inference API feature-extraction pipeline.
+        BERT/BGE feature extraction returns unpooled token-level hidden states in a 3D/2D array:
+          - Single text unpooled: depth 2 of shape [seq_len, embedding_dim]
+          - Batch text unpooled: depth 3 of shape [batch_size, seq_len, embedding_dim]
+        We pool along the sequence dimension using numpy.mean to obtain perfect 1D/2D sentence vectors.
+        """
+        import numpy as np
+        if not isinstance(res, list) or len(res) == 0:
+            raise ValueError("Invalid response from Hugging Face Inference API.")
+            
+        # Dynamically determine the nesting depth of the returned JSON list
+        depth = 0
+        curr = res
+        while isinstance(curr, list) and len(curr) > 0:
+            depth += 1
+            curr = curr[0]
+            
+        logger.info(f"Hugging Face response parsed with depth={depth} (expect_batch={expect_batch})")
+        
+        # Case 1: depth is 3 -> shape is [batch_size, seq_len, embedding_dim]
+        if depth == 3:
+            pooled = []
+            for batch_item in res:
+                arr = np.array(batch_item)  # shape: [seq_len, embedding_dim]
+                mean_vec = np.mean(arr, axis=0)  # shape: [embedding_dim]
+                pooled.append(mean_vec.tolist())
+            
+            if expect_batch:
+                return pooled
+            else:
+                return pooled[0]
+                
+        # Case 2: depth is 2 -> shape could be [seq_len, embedding_dim] or already pooled [batch_size, embedding_dim]
+        elif depth == 2:
+            if expect_batch:
+                # If we expect a batch, and it is depth 2, it is already a pooled batch: [batch_size, embedding_dim]
+                return res
+            else:
+                # If we expect a single vector, and it is depth 2, it is unpooled: [seq_len, embedding_dim]
+                arr = np.array(res)
+                mean_vec = np.mean(arr, axis=0)
+                return mean_vec.tolist()
+                
+        # Case 3: depth is 1 -> shape is [embedding_dim]
+        elif depth == 1:
+            if expect_batch:
+                return [res]
+            else:
+                return res
+                
+        raise ValueError(f"Unsupported embedding response shape from HF: depth {depth}")
+
     def embed_query(self, text: str):
         """
         Embeds a single query string.
@@ -72,11 +126,7 @@ class BGEEmbeddings:
             
         if self.use_cloud:
             res = self._query_hf_api([input_text])
-            if isinstance(res, list) and len(res) > 0:
-                if isinstance(res[0], list):
-                    return res[0]
-                return res  # 1D list already
-            raise ValueError(f"Unexpected response format from HF API: {res}")
+            return self._pool_response(res, expect_batch=False)
 
         if not self.model:
             raise ValueError("Embedding model not loaded.")
@@ -97,11 +147,7 @@ class BGEEmbeddings:
 
         if self.use_cloud:
             res = self._query_hf_api(texts)
-            if isinstance(res, list) and len(res) > 0:
-                if isinstance(res[0], list):
-                    return res
-                return [res]  # 1D list to 2D
-            raise ValueError(f"Unexpected response format from HF API: {res}")
+            return self._pool_response(res, expect_batch=True)
 
         if not self.model:
             raise ValueError("Embedding model not loaded.")
