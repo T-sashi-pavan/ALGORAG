@@ -11,13 +11,37 @@ class MongoDBVectorStore:
         self.uri = os.getenv("MONGODB_URI")
         self.db_name = "algonox_rag"
         self.collection_name = "document_chunks"
+        self.online = False
+        
+        # Defensive default attributes to prevent AttributeError on connection failure
+        self.client = None
+        self.db = None
+        self.collection = None
+        self.summaries_collection = None
+        self.sessions_collection = None
+        self.messages_collection = None
+        self.files_collection = None
+        self.priority_documents = None
+        self.document_rankings = None
+        self.email_logs = None
+        self.mail_delivery_status = None
+        self.selected_documents = None
+        self.review_actions = None
         
         if not self.uri:
-            raise ValueError("MONGODB_URI is not set in environment variables.")
+            logger.error("MONGODB_URI is not set in environment variables. Running in OFFLINE fallback mode.")
+            return
             
         try:
             import certifi
-            self.client = MongoClient(self.uri, tlsCAFile=certifi.where(), tlsAllowInvalidCertificates=True, tls=True)
+            # Set a 5-second server selection timeout to prevent long hangs on cold startups or invalid IPs
+            self.client = MongoClient(
+                self.uri, 
+                tlsCAFile=certifi.where(), 
+                tlsAllowInvalidCertificates=True, 
+                tls=True,
+                serverSelectionTimeoutMS=5000
+            )
             self.db = self.client[self.db_name]
             self.collection = self.db[self.collection_name]
             
@@ -35,22 +59,25 @@ class MongoDBVectorStore:
             self.selected_documents = self.db["selected_documents"]
             self.review_actions = self.db["review_actions"]
             
+            # Try to build basic ascending indices (wrapped safely to prevent failures if permissions are read-only)
+            try:
+                self.collection.create_index("document_id")
+                self.collection.create_index("filename")
+                self.files_collection.create_index("document_id")
+                self.summaries_collection.create_index("document_id")
+                self.sessions_collection.create_index("created_at")
+                self.messages_collection.create_index("session_id")
+                self.priority_documents.create_index("document_id")
+                self.email_logs.create_index("sent_at")
+                self.mail_delivery_status.create_index("delivery_id")
+            except Exception as index_err:
+                logger.warning(f"Failed to create indices: {index_err}. Continuing anyway...")
+                
+            self.online = True
             logger.info("Successfully connected to MongoDB Atlas and initialized all collections.")
-            
-            # Try to build basic ascending indices for high performance metadata queries
-            self.collection.create_index("document_id")
-            self.collection.create_index("filename")
-            self.files_collection.create_index("document_id")
-            self.summaries_collection.create_index("document_id")
-            self.sessions_collection.create_index("created_at")
-            self.messages_collection.create_index("session_id")
-            
-            self.priority_documents.create_index("document_id")
-            self.email_logs.create_index("sent_at")
-            self.mail_delivery_status.create_index("delivery_id")
         except Exception as e:
-            logger.error(f"Failed to connect or initialize MongoDB indexes: {e}")
-            raise e
+            logger.error(f"Failed to connect or initialize MongoDB: {e}. Running in OFFLINE fallback mode.")
+            self.online = False
 
     def insert_chunks(self, chunks):
         """

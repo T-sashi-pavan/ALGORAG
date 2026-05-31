@@ -35,10 +35,21 @@ app = FastAPI(
 )
 
 # Configure Premium CORS Policies for secure Next.js interactions
+allowed_origins = [
+    "http://localhost:3000",
+    "https://algonox-rag-frontend.onrender.com"
+]
+env_origins = os.getenv("ALLOWED_ORIGINS")
+if env_origins:
+    for o in env_origins.split(","):
+        o_clean = o.strip()
+        if o_clean and o_clean not in allowed_origins:
+            allowed_origins.append(o_clean)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, restrict to Vercel/EC2 host domain
-    allow_credentials=False,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
