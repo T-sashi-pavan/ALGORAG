@@ -1,5 +1,16 @@
 # 🌌 ALGONOX RAG: Enterprise-Grade Multimodal Grounded Document Intelligence
 
+<div align="center">
+  <a href="https://algonox-rag-frontend.onrender.com" target="_blank">
+    <img src="https://img.shields.io/badge/Live%20Demo-algonox--rag--frontend.onrender.com-blue?style=for-the-badge&logo=render&logoColor=white&color=6366f1" alt="Live Demo" />
+  </a>
+  <a href="https://algonox-rag-backend.onrender.com" target="_blank">
+    <img src="https://img.shields.io/badge/API%20Service-algonox--rag--backend.onrender.com-green?style=for-the-badge&logo=fastapi&logoColor=white&color=14b8a6" alt="API Service" />
+  </a>
+</div>
+
+---
+
 Algonox RAG (codename: **RAGINI**) is a premium, state-of-the-art Multimodal Retrieval-Augmented Generation & Intelligent Scraping Engine. Equipped with mathematically calibrated multi-portal search scraping, variable-length semantic chunking, dense vector indexes, and integrated AI-assisted mail routing triage, it represents the cutting-edge of enterprise document intelligence.
 
 ---
