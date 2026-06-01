@@ -1,6 +1,5 @@
 import os
 import logging
-from sentence_transformers import CrossEncoder
 
 logger = logging.getLogger("algonox.reranker")
 
@@ -11,6 +10,7 @@ class BGEReranker:
         
         try:
             logger.info(f"Attempting to load reranker model: {self.model_name}")
+            from sentence_transformers import CrossEncoder
             # CrossEncoder loads standard reranking models
             self.model = CrossEncoder(self.model_name)
             logger.info("Reranker model loaded successfully.")
